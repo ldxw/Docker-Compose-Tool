@@ -6,7 +6,7 @@
 
 示例站点：[dc.365888.xyz](https://dc.365888.xyz/)
 
-注意：本项目在这个 https://github.com/hyang0/docker2compose 项目的基础上AI搓的
+注意：本项目是在这个[docker2compose](https://github.com/hyang0/docker2compose)项目的基础上AI搓的
 
 虽然更迭了好几版了，但是不排除还有BUG，转换完记得肉眼核实映射卷是否合规再复制应用到compose
 
