@@ -1,8 +1,8 @@
 # Docker-Compose-Tool
 
-本项目主要用来自定义卷映射的绝对路径，统一管理所有项目的卷映射（不含隐藏卷）到同一个目录下
+本项目主要用来自定义Docker卷映射的绝对路径，统一管理所有项目的卷映射（不含隐藏卷）到同一个大目录下
 
-解决各docker项目只推荐卷映射，导致小白依样画葫芦docker内部卷映射到哪里都不清楚
+解决各docker项目只推荐卷映射，导致小白依样画葫芦docker内部卷映射到哪里都不清楚的问题，方便打包备份迁移
 
 网站示例：
 <img width="1207" height="589" alt="捕获" src="https://github.com/user-attachments/assets/982f85ba-f810-46d7-809c-ae6559467dfe" />
