@@ -4,7 +4,9 @@
 
 解决各docker项目只推荐卷映射，导致小白依样画葫芦docker内部卷映射到哪里都不清楚
 
-示例站点：[dc.365888.xyz](https://dc.365888.xyz/)
+网站示例：
+<img width="1207" height="589" alt="捕获" src="https://github.com/user-attachments/assets/982f85ba-f810-46d7-809c-ae6559467dfe" />
+
 
 注意：
 本项目是在这个[docker2compose](https://github.com/hyang0/docker2compose)项目的基础上AI搓的，感谢原作者
