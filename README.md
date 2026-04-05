@@ -1,75 +1,70 @@
-## Docker-Compose-Tool 🐳
-—— 让你的 Docker 项目拥有专属的“精装修单间”。
-
-本工具的核心目的在于解决 Docker 部署中挂载路径碎片化、管理混乱的痛点。通过规范化的 “一容器一目录” 转换逻辑，将分散的 docker run 命令或原始 Compose 配置，重构为易备份、易迁移的标准化目录结构。
+Docker-Compose-Tool 🐳
+让 Docker 部署告别碎片化，实现“一容器一目录”的标准化管理。
 
 🏗️ 核心哲学：图纸与材料“同屋”存放
-在传统的 Docker 部署中，挂载卷（Volumes）往往散落在系统的各个角落（如 /var/lib/docker/volumes 或各种 /etc/xxx）。当你想备份或迁移某个项目时，找齐这些“装修材料”简直是噩梦。
+在玩 Docker 的时候，最痛苦的莫过于处理 -v 卷映射。很多项目只给了一行 docker run 命令，或者默认用户能看懂复杂的 Compose 规则。结果就是：装了几个项目后，各种映射卷零零散散地躺在宿主机的各个目录里，极其混乱。
 
-本工具强制推行以下部署规范：
+本工具的核心目的：
 
-统一大目录：所有 Docker 项目挂载卷统一存放在服务器的一个主目录下（如 /opt/docker）。
+统一管理：所有的 Docker 项目映射卷统一存放在一个大目录（如 /opt/docker）。
 
-容器子目录：以 容器名 为子目录，存放该项目的所有数据。
+子目录隔离：以 容器名 为子目录存放配置文件和数据（例如 /opt/docker/vaultwarden）。
 
-图纸与材料合一：建议将生成的 docker-compose.yml（图纸）也放在这个子目录下。
+无损迁移：这相当于把 Docker 项目的 “图纸” (Compose 文件) 和 “装修材料” (映射数据) 放在了一起。
 
-这样做的意义：
-
-无损恢复：备份时只需打包这一个子目录。迁移到新服务器后，只需 cd 进入子目录并执行 docker compose up -d，容器即可带着所有数据“无损复活”。
-
-路径清晰：一眼就能看出哪个文件夹对应哪个容器，不再有无主的数据卷。
+极简运维：以后备份或迁移，只需要打包这个子目录；恢复时只需 cd 进去执行 docker compose up -d 即可。
 
 💎 特色功能：自定义卷映射重构
-本工具针对上述哲学，对 Volume 卷映射 进行了深度优化：
+针对“一容器一目录”的设计哲学，本工具对 Volume 卷映射 进行了专项优化：
 
-自动对齐容器名：工具会自动提取 container_name 作为服务名和目录名，确保生成的挂载路径与你的项目结构高度一致。
+自动路径对齐：工具会自动提取容器名，将其作为挂载路径的子目录，确保路径结构整齐划一。
 
-绝对路径规范化：自动识别并将各种凌乱的挂载参数转化为标准的 YAML 数组格式。
+绝对路径规范化：自动识别并转换 /mnt/data:/config 等复杂绝对路径，防止手动编写 YAML 时出现缩进或语法错误。
 
-命名卷（Named Volumes）自动声明：遇到命名卷时，工具会自动在 YAML 末尾补全根级声明，确保配置文件是完整、可直接运行的“终稿”。
+命名卷（Named Volumes）自动声明：当检测到非路径格式的映射（如 db_data:/var）时，工具会自动在 YAML 末尾生成根级别的 volumes: 声明块。
 
-路径安全包裹：自动为所有路径添加双引号，防止特殊字符（如空格、@ 等）导致 Compose 无法启动。
+路径安全引号：自动为所有路径添加双引号包裹，完美避开路径中包含空格、@、$ 等特殊字符导致的解析失败。
 
 🚀 为什么选择它？
-生产环境预设：默认勾选 unless-stopped 自动重启逻辑，符合 VPS 长期运维的最佳实践。
+100% 隐私安全：纯 HTML + JS 静态实现，无后端交互。你的路径、环境变量、API Key 等敏感数据仅在浏览器本地处理，绝不上传。
 
-极致隐私安全：纯 HTML + JS 静态实现，无后端交互。你的路径信息、API Key、环境变量仅在浏览器本地处理，绝不上传。
+生产环境预设：默认勾选 unless-stopped 自动重启策略，符合云服务器（Alibaba Cloud/DMIT）的长期运行最佳实践。
 
-零门槛自建：项目仅包含 index.html 和 volumes.js（或 volume-parser.js），无需安装任何运行环境。
+零门槛自建：项目仅包含 index.html 和 volumes.js，下载即可运行，无需复杂的 Docker 镜像构建或环境配置。
 
 🛠️ 使用指南（下载即用）
-获取文件：下载本仓库中的 index.html 和相应的 JS 脚本。
+获取文件：下载本仓库中的 index.html 和 volumes.js。
 
-本地开启：确保文件同目录，用浏览器打开 index.html。
+本地运行：确保两个文件在同一目录下，直接用 Chrome 或 Edge 浏览器打开 index.html。
 
-转换逻辑：
+一键转换：
 
-粘贴你从项目文档中看到的 docker run 命令。
+粘贴从官方文档或 GitHub 看到的 docker run 命令。
 
-根据你的“统一大目录”规划，在生成的配置中确认卷映射。
+确认生成的路径符合你的“统一大目录”规划。
 
 点击“转换为 Compose 配置”并一键复制。
 
-部署：在你的统一目录下创建同名文件夹，将代码存为 docker-compose.yml，然后执行 up -d。
+快速部署：在你的统一目录下创建同名文件夹，将代码存为 docker-compose.yml，执行 docker compose up -d。
 
 📄 转换对比示例
-输入：
-docker run -d --name vaultwarden -v /my_docker_root/vaultwarden/data:/data -p 8080:80 vaultwarden/server:latest
+原始 Docker Run 命令：
 
-生成的“图纸”：
+Bash
+docker run -d --name vaultwarden -v /my_docker_root/vaultwarden/data:/data -p 8080:80 vaultwarden/server:latest
+工具生成的标准化“图纸”：
 
 YAML
 version: '3.8'
 services:
-  vaultwarden:  # 自动同步容器名
+  vaultwarden:
     image: vaultwarden/server:latest
     container_name: vaultwarden
     volumes:
       - "/my_docker_root/vaultwarden/data:/data"  # 路径、图纸、材料完美闭环
     ports:
       - "8080:80"
-    restart: unless-stopped                   # 预设生产重启策略
+    restart: unless-stopped                       # 预设生产重启策略
 📄 开源协议
 本项目采用 MIT License 协议开源。
 
