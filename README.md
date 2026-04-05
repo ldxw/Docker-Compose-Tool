@@ -1,84 +1,76 @@
-# Docker-Compose-Tool
+## Docker-Compose-Tool 🐳
+—— 让你的 Docker 项目拥有专属的“精装修单间”。
 
-本项目主要用来自定义Docker卷映射的绝对路径，统一管理所有项目的卷映射（不含隐藏卷）到同一个大目录下
+本工具的核心目的在于解决 Docker 部署中挂载路径碎片化、管理混乱的痛点。通过规范化的 “一容器一目录” 转换逻辑，将分散的 docker run 命令或原始 Compose 配置，重构为易备份、易迁移的标准化目录结构。
 
-解决各docker项目只推荐卷映射，导致小白依样画葫芦docker内部卷映射到哪里都不清楚的问题，方便打包备份迁移
+🏗️ 核心哲学：图纸与材料“同屋”存放
+在传统的 Docker 部署中，挂载卷（Volumes）往往散落在系统的各个角落（如 /var/lib/docker/volumes 或各种 /etc/xxx）。当你想备份或迁移某个项目时，找齐这些“装修材料”简直是噩梦。
 
-网站示例：
-<img width="1207" height="589" alt="捕获" src="https://github.com/user-attachments/assets/982f85ba-f810-46d7-809c-ae6559467dfe" />
+本工具强制推行以下部署规范：
 
+统一大目录：所有 Docker 项目挂载卷统一存放在服务器的一个主目录下（如 /opt/docker）。
 
-注意：
-本项目是在这个[docker2compose](https://github.com/hyang0/docker2compose)项目的基础上AI搓的，感谢原作者
+容器子目录：以 容器名 为子目录，存放该项目的所有数据。
 
-虽然更迭了好几版了，但是不排除还有BUG，转换完记得肉眼核实映射卷是否合规再复制应用到compose
+图纸与材料合一：建议将生成的 docker-compose.yml（图纸）也放在这个子目录下。
 
+这样做的意义：
 
+无损恢复：备份时只需打包这一个子目录。迁移到新服务器后，只需 cd 进入子目录并执行 docker compose up -d，容器即可带着所有数据“无损复活”。
 
-Docker Run 转 Compose 工具 - 使用说明
-======================================
+路径清晰：一眼就能看出哪个文件夹对应哪个容器，不再有无主的数据卷。
 
-【文件结构】
+💎 特色功能：自定义卷映射重构
+本工具针对上述哲学，对 Volume 卷映射 进行了深度优化：
 
-├── index.html      ← 主页面，直接用浏览器访问
+自动对齐容器名：工具会自动提取 container_name 作为服务名和目录名，确保生成的挂载路径与你的项目结构高度一致。
 
-└── volumes.js      ← 配置文件，设置默认卷映射路径
+绝对路径规范化：自动识别并将各种凌乱的挂载参数转化为标准的 YAML 数组格式。
 
-两个文件必须放在同一目录下。
+命名卷（Named Volumes）自动声明：遇到命名卷时，工具会自动在 YAML 末尾补全根级声明，确保配置文件是完整、可直接运行的“终稿”。
 
+路径安全包裹：自动为所有路径添加双引号，防止特殊字符（如空格、@ 等）导致 Compose 无法启动。
 
-【部署方式】
+🚀 为什么选择它？
+生产环境预设：默认勾选 unless-stopped 自动重启逻辑，符合 VPS 长期运维的最佳实践。
 
-方式一：放到网站根目录
-  将 index.html 和 volumes.js 上传到站点根目录或子目录
-  例如：https://你的域名/ 或 https://你的域名/docker/
-  
-方式二：本地使用
-  双击 index.html 直接用浏览器打开即可
+极致隐私安全：纯 HTML + JS 静态实现，无后端交互。你的路径信息、API Key、环境变量仅在浏览器本地处理，绝不上传。
 
+零门槛自建：项目仅包含 index.html 和 volumes.js（或 volume-parser.js），无需安装任何运行环境。
 
-【修改默认卷映射路径】
+🛠️ 使用指南（下载即用）
+获取文件：下载本仓库中的 index.html 和相应的 JS 脚本。
 
-打开 volumes.js，由于我使用dpanel面板，所以默认的内容格式为：
+本地开启：确保文件同目录，用浏览器打开 index.html。
 
-  VOLUME_PREFIX='/home/dpanel/compose/{container_name}'
+转换逻辑：
 
-请按自己的实际需求修改引号内的路径，保存后刷新网页即可生效。
+粘贴你从项目文档中看到的 docker run 命令。
 
-示例：
+根据你的“统一大目录”规划，在生成的配置中确认卷映射。
 
-  VOLUME_PREFIX='/home/dpanel/compose/{container_name}'
-  
-  VOLUME_PREFIX='/opt/docker/{container_name}'
-  
-  VOLUME_PREFIX='/data/containers/{container_name}'
+点击“转换为 Compose 配置”并一键复制。
 
-其中 {container_name} 会在转换时自动替换为容器名。
-如果留空 VOLUME_PREFIX='' 则不做路径替换，保持原始路径。
+部署：在你的统一目录下创建同名文件夹，将代码存为 docker-compose.yml，然后执行 up -d。
 
+📄 转换对比示例
+输入：
+docker run -d --name vaultwarden -v /my_docker_root/vaultwarden/data:/data -p 8080:80 vaultwarden/server:latest
 
-【注意事项】
+生成的“图纸”：
 
-1. volumes.js 里的内容必须保持 VOLUME_PREFIX='路径' 格式
-   前面的注释行（以 // 开头）可以保留或删除，不影响功能
+YAML
+version: '3.8'
+services:
+  vaultwarden:  # 自动同步容器名
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    volumes:
+      - "/my_docker_root/vaultwarden/data:/data"  # 路径、图纸、材料完美闭环
+    ports:
+      - "8080:80"
+    restart: unless-stopped                   # 预设生产重启策略
+📄 开源协议
+本项目采用 MIT License 协议开源。
 
-2. 以下系统路径会自动保持原样，不会被替换：
-   /var/run/docker.sock  （Docker 引擎通信）
-   
-   /etc/localtime        （时区同步）
-   
-   /etc/timezone
-     
-   /etc/hosts
-
-   /etc/resolv.conf
-       
-   /proc /sys /dev        （系统设备/内核）
-   
-   等其他系统级挂载路径
-
-4. 网页上的"自定义卷映射绝对路径"输入框可以临时修改路径
-   但刷新页面后会恢复为 volumes.js 中设置的值
-
-5. 修改 volumes.js 后如果刷新无效
-   请按 Ctrl+Shift+R（Windows）或 Cmd+Shift+R（Mac）强制刷新
+如果您认同这种“一容器一目录”的部署哲学，请点一个 Star ⭐️ 鼓励作者持续优化！
